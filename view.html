@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Todo List</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="download-card">
+
+        <div class="logo">
+            ✓ SmartTodo
+        </div>
+
+        <h1>Shared Todo List</h1>
+
+        <h3 id="username"></h3>
+
+        <ul id="taskList"></ul>
+
+        <div class="button-group">
+            <button onclick="goHome()">
+                Create Your Own List
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const username =
+            params.get("user") || "User";
+
+        document
+            .getElementById("username")
+            .innerText =
+            username + "'s Tasks";
+
+        const taskData =
+            params.get("tasks");
+
+        let tasks = [];
+
+        try {
+
+            if (taskData) {
+
+                tasks =
+                    JSON.parse(
+                        decodeURIComponent(taskData)
+                    );
+            }
+
+        } catch (e) {
+
+            document
+                .getElementById("taskList")
+                .innerHTML =
+                "<li>Unable to load tasks</li>";
+        }
+
+        let ul =
+            document.getElementById("taskList");
+
+        tasks.forEach(task => {
+
+            let li =
+                document.createElement("li");
+
+            li.innerHTML = `
+                <span>
+                    ${task.task}
+                    <br>
+                    <small>${task.date}</small>
+                </span>
+            `;
+
+            ul.appendChild(li);
+
+        });
+
+        function goHome() {
+
+            window.location.href =
+                "index.html";
+        }
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completed Tasks</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="download-card">
+
+```
+<div class="logo">
+    ✓ SmartTodo
+</div>
+
+<h1>Completed Tasks</h1>
+
+<h3 id="userName"></h3>
+
+<ul id="completedList"></ul>
+
+<div class="button-group">
+
+    <button onclick="downloadTasks()">
+        Download List
+    </button>
+
+    <button
+        class="whatsapp-btn"
+        onclick="sendWhatsApp()">
+        WhatsApp Share
+    </button>
+
+</div>
+```
+
+</div>
+
+<script>
+
+let username =
+    localStorage.getItem("username") || "User";
+
+let tasks =
+    JSON.parse(
+        localStorage.getItem("tasks")
+    ) || [];
+
+document
+    .getElementById("userName")
+    .innerText =
+    username + "'s Todo List";
+
+let ul =
+    document.getElementById("completedList");
+
+renderTasks();
+
+function renderTasks(){
+
+    ul.innerHTML = "";
+
+    tasks.forEach((task,index)=>{
+
+        let formattedDate = "";
+
+        if(task.date){
+
+            let parts =
+                task.date.split("-");
+
+            formattedDate =
+                parts[2] + "-" +
+                parts[1] + "-" +
+                parts[0];
+        }
+
+        let li =
+            document.createElement("li");
+
+        li.innerHTML = `
+            <div>
+                <strong>${task.task}</strong>
+                <br>
+                <small>${formattedDate}</small>
+            </div>
+
+            <button
+                class="edit-btn"
+                onclick="editTask(${index})">
+                Edit
+            </button>
+        `;
+
+        ul.appendChild(li);
+    });
+}
+
+function editTask(index){
+
+    let newTask =
+        prompt(
+            "Edit Task",
+            tasks[index].task
+        );
+
+    if(newTask === null){
+        return;
+    }
+
+    newTask =
+        newTask.trim();
+
+    if(newTask === ""){
+
+        alert(
+            "Task cannot be empty"
+        );
+
+        return;
+    }
+
+    let oldDate = "";
+
+    if(tasks[index].date){
+
+        let parts =
+            tasks[index]
+            .date
+            .split("-");
+
+        oldDate =
+            parts[2] + "-" +
+            parts[1] + "-" +
+            parts[0];
+    }
+
+    let newDate =
+        prompt(
+            "Edit Date (dd-mm-yyyy)",
+            oldDate
+        );
+
+    if(newDate === null){
+        return;
+    }
+
+    let dateParts =
+        newDate.split("-");
+
+    if(dateParts.length === 3){
+
+        tasks[index].date =
+            dateParts[2] + "-" +
+            dateParts[1] + "-" +
+            dateParts[0];
+    }
+
+    tasks[index].task =
+        newTask;
+
+    localStorage.setItem(
+        "tasks",
+        JSON.stringify(tasks)
+    );
+
+    renderTasks();
+}
+
+function downloadTasks(){
+
+    let content =
+        `${username}'s Todo List\n\n`;
+
+    tasks.forEach((task,index)=>{
+
+        let formattedDate = "";
+
+        if(task.date){
+
+            let parts =
+                task.date.split("-");
+
+            formattedDate =
+                parts[2] + "-" +
+                parts[1] + "-" +
+                parts[0];
+        }
+
+        content +=
+            `${index + 1}. ${task.task} ${formattedDate}\n`;
+
+    });
+
+    let blob =
+        new Blob(
+            [content],
+            {type:"text/plain"}
+        );
+
+    let a =
+        document.createElement("a");
+
+    a.href =
+        URL.createObjectURL(blob);
+
+    a.download =
+        username +
+        "_TodoList.txt";
+
+    a.click();
+}
+
+function sendWhatsApp(){
+
+    if(tasks.length === 0){
+
+        alert(
+            "No tasks available"
+        );
+
+        return;
+    }
+
+    let message =
+        `${username}'s Todo List\n\n`;
+
+    tasks.forEach((task,index)=>{
+
+        let formattedDate = "";
+
+        if(task.date){
+
+            let parts =
+                task.date.split("-");
+
+            formattedDate =
+                parts[2] + "-" +
+                parts[1] + "-" +
+                parts[0];
+        }
+
+        message +=
+            `${index + 1}. ${task.task} ${formattedDate}\n`;
+
+    });
+
+    let whatsappURL =
+        `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+    window.open(
+        whatsappURL,
+        "_blank"
+    );
+}
+
+</script>
+
+</body>
+</html>

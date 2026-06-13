@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="logo">
+            ✓ SmartTodo
+        </div>
+
+        <h1 id="welcome"></h1>
+
+        <div class="counter">
+
+            <div class="counter-box">
+                Total Tasks:
+                <span id="totalCount">0</span>
+            </div>
+
+            <div class="counter-box">
+                Today's Date
+            </div>
+
+        </div>
+
+        <input type="date" id="date">
+
+        <div class="taskbox">
+
+            <input
+                type="text"
+                id="task"
+                placeholder="Enter your task">
+
+            <button onclick="addTask()">
+                Add
+            </button>
+
+        </div>
+
+        <ul id="taskList"></ul>
+
+        <button
+            class="complete"
+            onclick="finishTasks()">
+            Complete
+        </button>
+
+    </div>
+
+    <script>
+
+        let tasks = [];
+
+        const username =
+            localStorage.getItem("username");
+
+        if(!username){
+
+            window.location.href =
+            "index.html";
+        }
+
+        document
+        .getElementById("welcome")
+        .innerText =
+        "Welcome, " + username;
+
+        function addTask(){
+
+            let taskInput =
+                document
+                .getElementById("task");
+
+            let task =
+                taskInput.value.trim();
+
+            let date =
+                document
+                .getElementById("date")
+                .value;
+
+            if(task === ""){
+
+                alert(
+                    "Please enter a task"
+                );
+
+                return;
+            }
+
+            let obj = {
+
+                task : task,
+
+                date : date
+            };
+
+            tasks.push(obj);
+
+            taskInput.value = "";
+
+            renderTasks();
+        }
+
+        function renderTasks(){
+
+            let ul =
+                document
+                .getElementById("taskList");
+
+            ul.innerHTML = "";
+
+            tasks.forEach(
+                (item,index)=>{
+
+                let li =
+                    document
+                    .createElement("li");
+
+                li.innerHTML =
+
+                `<span>
+                    ${item.task}
+                    <br>
+                    <small>
+                    ${item.date}
+                    </small>
+                </span>
+
+                <button
+                onclick="removeTask(${index})">
+                Remove
+                </button>`;
+
+                ul.appendChild(li);
+
+            });
+
+            document
+            .getElementById("totalCount")
+            .innerText =
+            tasks.length;
+        }
+
+        function removeTask(index){
+
+            tasks.splice(index,1);
+
+            renderTasks();
+        }
+
+        function finishTasks(){
+
+            if(tasks.length === 0){
+
+                alert(
+                "Add at least one task"
+                );
+
+                return;
+            }
+
+            localStorage.setItem(
+                "tasks",
+                JSON.stringify(tasks)
+            );
+
+            window.location.href =
+            "download.html";
+        }
+
+        document
+        .getElementById("task")
+        .addEventListener(
+            "keypress",
+            function(event){
+
+                if(event.key==="Enter"){
+
+                    addTask();
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+</html>
